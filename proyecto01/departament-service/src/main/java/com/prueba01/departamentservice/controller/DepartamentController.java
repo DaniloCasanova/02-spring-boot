@@ -11,6 +11,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/departaments")
+//Habilitamos acceso desde (Localhost) Live Server
+@CrossOrigin(origins = "http://127.0.0.1:5500") // Add this line
+
 public class DepartamentController {
     private final DepartamentService departamentService;
 
@@ -19,18 +22,32 @@ public class DepartamentController {
     }
 
     @PostMapping
-    public Departament createDepartament(@RequestBody Departament departament) {
-        return departamentService.createDepartament(departament);
+    public ResponseEntity<DepartamentDTO> createDepartament(@RequestBody DepartamentDTO departamentDTO) {
+        DepartamentDTO departamentDTONew = departamentService.createDepartament(departamentDTO);
+
+        //Respondemos ResponseEntity
+        return ResponseEntity.ok(departamentDTONew);
     }
 
     @GetMapping("/{id}")
-    public Departament getDepartamentById(@PathVariable Integer id) {
-        return departamentService.getDepartamentById(id);
+    public ResponseEntity<DepartamentDTO> getDepartamentById(@PathVariable Integer id) {
+        DepartamentDTO departamentDTO = departamentService.getDepartamentById(id);
+        //Respondemos ResponseEntity
+        return ResponseEntity.ok(departamentDTO);
     }
 
     @GetMapping
-    public List<Departament> findAll() {
-        return departamentService.findAll();
+    public ResponseEntity<List<DepartamentDTO>> findAll() {
+        //Buscamos departamentos con metodo del Servicio
+        List<DepartamentDTO> departamentosDTO = departamentService.findAll();
+
+        //Verificacion Lista vacia
+        if (departamentosDTO.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        //Todo ok. Retornamos empleados encontrados.
+        return ResponseEntity.ok(departamentosDTO);
     }
 
     @DeleteMapping("/{id}")
@@ -43,12 +60,13 @@ public class DepartamentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Departament> updateDepartamentById(@PathVariable Integer id,
-                                                             @RequestBody DepartamentDTO departamentDTO) {
+    public ResponseEntity<DepartamentDTO> updateDepartamentById(@PathVariable Integer id,
+                                                                @RequestBody DepartamentDTO departamentDTO) {
         //Actualizamos depto.
-        Departament departament = departamentService.updateDepartamentById(id, departamentDTO);
+        DepartamentDTO departamentDTOUpdated = departamentService.updateDepartamentById(id, departamentDTO);
+
         //Respondemos ResponseEntity
-        return ResponseEntity.ok(departament);
+        return ResponseEntity.ok(departamentDTOUpdated);
     }
 
 }
